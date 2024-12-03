@@ -11,9 +11,6 @@ public class December3 {
     public static void main(String[] args) {
         try {
             //First();
-            //> 52874778
-            //< 75587648
-            //  75587648
             Second();
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
@@ -27,14 +24,14 @@ public class December3 {
         int sum = 0;
 
         String regex = "mul\\(\\d{1,3},\\d{1,3}\\)";
-        
+
         Pattern pattern = Pattern.compile(regex);
-        
+
         while (myReader.hasNextLine()) {
             var data = myReader.nextLine();
-            
+
             Matcher matcher = pattern.matcher(data);
-            
+
             while (matcher.find()) {
                 //System.out.println("Found number: " + matcher.group());
                 sum += multiply(matcher.group());
@@ -43,43 +40,45 @@ public class December3 {
 
         System.out.println(sum);
     }
-    
-    public static void Second() throws FileNotFoundException {
-        var input = new File("src/December3/Data/input2.txt");
-        Scanner myReader = new Scanner(input);
-        var goodLines = new ArrayList<String>();
-        int sum = 0;
 
-        String regex = "mul\\(\\d{1,3},\\d{1,3}\\)";
+    public static void Second() throws FileNotFoundException {
+        var input = new File("src/December3/Data/input.txt");
+        Scanner myReader = new Scanner(input);
+        StringBuilder corruptedMemory = new StringBuilder();
+        
+        // Read the entire input
+        while (myReader.hasNextLine()) {
+            String data = myReader.nextLine();
+            corruptedMemory.append(data);
+        }
+        myReader.close();
+
+        int sum = 0;
+        boolean enabled = true;
+
+        // Regex pattern to match mul(X,Y), do(), or don't()
+        String regex = "(mul\\((\\d{1,3}),(\\d{1,3})\\))" + // Group 1: mul(X,Y)
+                "|(do\\(\\))" +                      // Group 4: do()
+                "|(don't\\(\\))";                    // Group 5: don't()
 
         Pattern pattern = Pattern.compile(regex);
-
-        while (myReader.hasNextLine()) {
-            var data = myReader.nextLine();
-            
-            var temp = data.split("don't\\(\\)");
-            goodLines.add(temp[0]);
-            
-            for(String s : temp) {
-                var x = s.split("do\\(\\)");
-                if(x.length > 1) {
-                    for (int i = 1; i < x.length; i++) {
-                        goodLines.add(x[i]);
-                    }
-                }
-            }
-        }
-
-        for(String s : goodLines) {
-            Matcher matcher = pattern.matcher(s);
-
-            while (matcher.find()) {
-                //System.out.println("Found number: " + matcher.group());
-                sum += multiply(matcher.group());
-            }
-        }
+        Matcher matcher = pattern.matcher(corruptedMemory.toString());
         
-        System.out.println(sum);
+        while (matcher.find()) {
+            if (matcher.group(1) != null) { // Found mul(X,Y)
+                if (enabled) {
+                    int x = Integer.parseInt(matcher.group(2));
+                    int y = Integer.parseInt(matcher.group(3));
+                    sum += x * y;
+                }
+            } else if (matcher.group(4) != null) { // Found do()
+                enabled = true;
+            } else if (matcher.group(5) != null) { // Found don't()
+                enabled = false;
+            }
+        }
+
+        System.out.println("Total Sum: " + sum);
     }
 
     private static int multiply(String input) {
