@@ -18,7 +18,7 @@ public class December1 {
     }
     
     public static void First() throws FileNotFoundException {
-        var input = new File("src/December1/Data/FirstInput.txt");
+        var input = new File("src/December1/Data/Input.txt");
         Scanner myReader = new Scanner(input);
         var leftCordinates = new ArrayList<Integer>();
         var rightCordinates = new ArrayList<Integer>();
@@ -43,12 +43,12 @@ public class December1 {
     }
     
     public static void Second() throws FileNotFoundException {
-        var input = new File("src/December1/Data/SecondInput.txt");
+        var input = new File("src/December1/Data/Input.txt");
         Scanner myReader = new Scanner(input);
         var leftCordinates = new ArrayList<Integer>();
         var rightCordinates = new ArrayList<Integer>();
         var consistencyScore = 0;
-
+        
         while (myReader.hasNextLine()) {
             var data = myReader.nextLine().split("\\s+");
             var left = data[0];
