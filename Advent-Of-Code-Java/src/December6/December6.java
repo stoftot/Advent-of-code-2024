@@ -1,19 +1,14 @@
 package December6;
 
-import com.sun.source.doctree.ValueTree;
-
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.lang.reflect.Array;
-import java.net.PortUnreachableException;
 import java.util.*;
 
 public class December6 {
     public static void main(String[] args) {
         try {
-            //First();
+            First();
             Second();
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
@@ -28,20 +23,18 @@ public class December6 {
         var map = creation.map;
         var guardPosX = creation.guardPosX;
         var guardPosY = creation.guardPosY;
-        var numberOfSpotsGuardVisited = 0;
+        var guardPosSet = new HashSet<Point>();
         
         try {
             while (true) {
+                guardPosSet.add(new Point(guardPosX, guardPosY));
                 var guardMovment = moveGuard(map, guardPosX, guardPosY);
                 guardPosX = guardMovment.newGuardPosX;
                 guardPosY = guardMovment.newGuardPosY;
-                if(!guardMovment.hasBeenThere) {
-                    numberOfSpotsGuardVisited++;
-                }
             }
         } catch (Exception e) {
             System.out.println(e);
-            System.out.println(numberOfSpotsGuardVisited+1);
+            System.out.println(guardPosSet.size());
         }
     }
     
@@ -57,35 +50,25 @@ public class December6 {
         var startGuardPosY = creation.guardPosY;
         var guardPosX = creation.guardPosX;
         var guardPosY = creation.guardPosY;
-        var numberOfSpotsGuardVisited = 0;
         
-        var setOfCoordinates = new HashSet<Point>();
+        var setOfCoordinatesVisited = new HashSet<Point>();
         
         //fill out map
         try {
             while (true) {
-                setOfCoordinates.add(new Point(guardPosX, guardPosY));
                 var guardMovment = moveGuard(map, guardPosX, guardPosY);
                 guardPosX = guardMovment.newGuardPosX;
                 guardPosY = guardMovment.newGuardPosY;
-                if(!guardMovment.hasBeenThere) {
-                    numberOfSpotsGuardVisited++;
-                }
+                setOfCoordinatesVisited.add(new Point(guardPosX, guardPosY));
             }
         } catch (Exception e) {
             System.out.println(e);
         }
         
         var numberOfPlacesObstacelCanBePlacedToCreateALoop = 0;
-        for(var point : setOfCoordinates) {
-            var x = (int)point.getX();
-            var y = (int)point.getY();
-            if(originalMap[x][y] == '^') {
-                continue;
-            }
-            
+        for(var point : setOfCoordinatesVisited) {
             var tempMap = copyMap(originalMap);
-            tempMap[x][y] = '#';
+            tempMap[(int)point.getX()][(int)point.getY()] = '#';
             var tempGuardPosX = startGuardPosX;
             var tempGuardPosY = startGuardPosY;
             
@@ -99,7 +82,6 @@ public class December6 {
                     if(mapForGuardPositions.containsKey(new Point(tempGuardPosX, tempGuardPosY))) {
                         var set = mapForGuardPositions.get(new Point(tempGuardPosX, tempGuardPosY));
                         if(set.contains(guardMovment.newGuard)) {
-                            //System.out.println("did loop with obstacle at: " + x + ", " + y);
                             numberOfPlacesObstacelCanBePlacedToCreateALoop++;
                             break;
                         }
@@ -110,7 +92,6 @@ public class December6 {
                         mapForGuardPositions.put(new Point(tempGuardPosX, tempGuardPosY), set);
                     }
                 } catch (Exception e) {
-                    //System.out.println("did not loop with obstacle at: " + x + ", " + y);
                     break;
                 }
             }
@@ -148,6 +129,28 @@ public class December6 {
         return cration;
     }
     
+    private static guardMovment moveGuard(char[][] map, int guardPosX, int guardPosY) throws Exception {
+        var newGuardMovment = new guardMovment();
+        char guard = map[guardPosX][guardPosY];
+        var newGuardPos = getNewGuardPos(guard, guardPosX, guardPosY);
+        
+        if(map[newGuardPos.x][newGuardPos.y] == '#'){
+            var newGuard = turnGuard(guard);
+            newGuardMovment.newGuardPosX = guardPosX;
+            newGuardMovment.newGuardPosY = guardPosY;
+            newGuardMovment.newGuard = newGuard;
+            map[guardPosX][guardPosY] = newGuard;
+            return newGuardMovment;
+        }
+
+        map[guardPosX][guardPosY] = 'X';
+        map[newGuardPos.x][newGuardPos.y] = guard;
+        newGuardMovment.newGuardPosX = newGuardPos.x;
+        newGuardMovment.newGuardPosY = newGuardPos.y;
+        newGuardMovment.newGuard = guard;
+        return newGuardMovment;
+    }
+
     private static char turnGuard(char guard) throws Exception {
         switch (guard) {
             case '^':
@@ -159,50 +162,19 @@ public class December6 {
             case '>':
                 return 'v';
         }
-        
         throw new Exception("Invalid guard");
     }
     
-    private static guardMovment moveGuard(char[][] map, int guardPosX, int guardPosY) throws Exception {
-        var newGuardMovment = new guardMovment();
-        newGuardMovment.hasBeenThere = false;
-        
-        char guard = map[guardPosX][guardPosY];
-        var newGuardPos = getNewGuardPos(guard, guardPosX, guardPosY);
-        
-        if(map[newGuardPos.guardPosX][newGuardPos.guardPosY] == 'X'){
-            newGuardMovment.hasBeenThere = true;
-        }
-        
-        
-        if(map[newGuardPos.guardPosX][newGuardPos.guardPosY] == '#'){
-            var newGuard = turnGuard(guard);
-            newGuardMovment.hasBeenThere = true;
-            newGuardMovment.newGuardPosX = guardPosX;
-            newGuardMovment.newGuardPosY = guardPosY;
-            newGuardMovment.newGuard = newGuard;
-            map[guardPosX][guardPosY] = newGuard;
-            return newGuardMovment;
-        }
-
-        map[guardPosX][guardPosY] = 'X';
-        map[newGuardPos.guardPosX][newGuardPos.guardPosY] = guard;
-        newGuardMovment.newGuardPosX = newGuardPos.guardPosX;
-        newGuardMovment.newGuardPosY = newGuardPos.guardPosY;
-        newGuardMovment.newGuard = guard;
-        return newGuardMovment;
-    }
-    
-    private static guardPos getNewGuardPos(char guard, int guardPosX, int guardPosY) {
+    private static Point getNewGuardPos(char guard, int guardPosX, int guardPosY) {
         switch (guard) {
             case '^':
-                return new guardPos(guardPosX - 1, guardPosY);
+                return new Point(guardPosX - 1, guardPosY);
             case 'v':
-                return new guardPos(guardPosX + 1, guardPosY);
+                return new Point(guardPosX + 1, guardPosY);
             case '<':
-                return new guardPos(guardPosX, guardPosY - 1);
+                return new Point(guardPosX, guardPosY - 1);
             case '>':
-                return new guardPos(guardPosX, guardPosY + 1);
+                return new Point(guardPosX, guardPosY + 1);
         }
         throw new IllegalArgumentException("Invalid guard");
     }
@@ -218,7 +190,6 @@ public class December6 {
     }
     
     private static class guardMovment{
-        boolean hasBeenThere;
         char newGuard;
         int newGuardPosX;
         int newGuardPosY;
@@ -228,15 +199,5 @@ public class December6 {
         char[][] map;
         int guardPosX;
         int guardPosY;
-    }
-    
-    private static class guardPos{
-        int guardPosX;
-        int guardPosY;
-
-        public guardPos(int guardPosX, int guardPosY) {
-            this.guardPosX = guardPosX;
-            this.guardPosY = guardPosY;
-        }
     }
 }
