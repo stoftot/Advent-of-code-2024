@@ -80,18 +80,13 @@ public class December8 {
             }
         }
         
-        var entyrsWithMoreThanOne = 0;
         for(var Enrty : map.frequencies.entrySet()){
             if(Enrty.getValue().size() > 1){
-                for(var point : Enrty.getValue()){
-                    if(!antinodesSet.contains(point)){
-                        entyrsWithMoreThanOne++;
-                    }
-                }
+                antinodesSet.addAll(Enrty.getValue());
             }
         }
         
-        System.out.println(antinodesSet.size()+entyrsWithMoreThanOne);
+        System.out.println(antinodesSet.size());
     }
 
 
