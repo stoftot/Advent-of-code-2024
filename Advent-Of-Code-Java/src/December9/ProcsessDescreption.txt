@@ -1,0 +1,44 @@
+Part 1
+To start, I read the input into a string using a StringBuilder 
+and converted it into an array of characters. 
+My initial approach involved looping through this array and moving characters as needed. 
+This worked fine for single-digit IDs, but it failed when IDs had multiple digits, 
+as it ended up splitting them incorrectly.
+
+I abandoned that idea and instead used a List<String> to represent the "disk." 
+To swap values, I maintained a pointer at the end of the disk. 
+I iterated through the list, and whenever I encountered a ".", 
+I swapped it with the value at the pointer and decremented the pointer until it reached valid data.
+To calculate the "filesystem checksum", I simply looped through the "disk," 
+summing up the values until encountering a ".".
+
+Part 2
+I initially tried rewriting the swapping logic to account for the current block's position and size,
+ as well as finding an empty space it could fit into. However, this quickly became overwhelming.
+
+To simplify, I added two Maps alongside the "disk" list from Part 1:
+
+- One Map to track the position and size of free spaces.
+- Another Map to track IDs along with their end positions and sizes 
+
+With these in place, I realized the old swapping logic from Part 1 wasn’t reusable, 
+so I developed a new implementation. 
+This time, I iterated over the data block IDs from largest to smallest. 
+For each block, I examined the free space keys in descending order 
+to process free spaces from left to right. If a suitable free space was found, 
+the data block was moved there. The free space Map was then updated to reflect any remaining space.
+
+To calculate the "filesystem checksum," I looped through the entire "disk" 
+and summed up all values encountered, skipping ".".
+
+Tho something was off, AoC said I had the wrong answer. 
+I reread the assignment and reviewed my code but couldn’t pinpoint the issue. 
+To debug, I created a larger test input and printed the state of the "disk" after each swap. 
+That’s when I realized I didn't acount for a key part of the assignment:
+
+"If there is no span of free space to the left of a file that is large enough to fit the file, 
+the file does not move."
+
+Initially, I interpreted this as "if no free space is available, the file doesn’t move." 
+However, it also meant that a block of data should only consider free spaces to its left. 
+This was fixed with a simple if statement.
