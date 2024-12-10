@@ -9,7 +9,7 @@ public class December10 {
     public static void main(String[] args) {
         try {
             First();
-            //Second();
+            Second();
         } catch (Exception e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
@@ -17,37 +17,76 @@ public class December10 {
     }
 
     public static void First() throws Exception {
-        var input = new File("src/December10/Data/test.txt");
+        var input = new File("src/December10/Data/input.txt");
         var myReader = new Scanner(input);
+        
         TrailMap map = createMap(myReader);
         
         int trailheadsScore = 0;
-        
+
+        //for each starting point, find all trailheads
         for(Point point : map.startingPoints) {
+            Set<Point> trailheads = new HashSet<>();
             Queue<Point> trail = new LinkedList<>();
             trail.add(point);
-            
+
+            //while there are points in the trail, try to expand it
             while(!trail.isEmpty()) {
                 Point current = trail.poll();
                 
+                //if the current point is a trailhead, add it to the set
                 if(map.map[current.y][current.x] == 9) {
-                    trailheadsScore++;
+                    trailheads.add(current);
                     continue;
                 }
                 
-                List<Point> nextPoints = hike(map.map, current);
+                //find the next valid points and add them to the trail
+                List<Point> nextPoints = expandPath(map.map, current);
                 trail.addAll(nextPoints);
             }
+            trailheadsScore += trailheads.size();
         }
         System.out.println(trailheadsScore);
     }
 
     public static void Second() throws Exception {
-        var input = new File("src/December10/Data/test.txt");
+        var input = new File("src/December10/Data/input.txt");
         var myReader = new Scanner(input);
+
+        TrailMap map = createMap(myReader);
+
+        int trailheadsScore = 0;
+        
+        //for each starting point, find all trailheads
+        for(Point point : map.startingPoints) {
+            Queue<Point> trail = new LinkedList<>();
+            trail.add(point);
+
+            //while there are points in the trail, try to expand it
+            while(!trail.isEmpty()) {
+                Point current = trail.poll();
+                
+                //if the current point is a trailhead, increase the score
+                if(map.map[current.y][current.x] == 9) {
+                    trailheadsScore++;
+                    continue;
+                }
+                
+                //find the next valid points and add them to the trail
+                List<Point> nextPoints = expandPath(map.map, current);
+                trail.addAll(nextPoints);
+            }
+        }
+        System.out.println(trailheadsScore);
     }
     
-    private static List<Point> hike(int[][] map, Point position) {
+    //Helper class
+    private static class TrailMap {
+        private int[][] map;
+        private List<Point> startingPoints;
+    }
+    
+    private static List<Point> expandPath(int[][] map, Point position) {
         var points = new ArrayList<Point>();
         int value = map[position.y][position.x];
         
@@ -74,6 +113,9 @@ public class December10 {
         return points;
     }
     
+    //create a map from input, return map, and starting points
+    //it's a bit unnecessary to convert the list to an array, 
+    //but I like 2d arrays when working with coordinates
     private static TrailMap createMap(Scanner scanner) {
         var map = new TrailMap();
         var lines = new ArrayList<String>();
@@ -96,10 +138,5 @@ public class December10 {
         }
         
         return map;
-    }
-    
-    private static class TrailMap {
-        private int[][] map;
-        private List<Point> startingPoints;
     }
 }
