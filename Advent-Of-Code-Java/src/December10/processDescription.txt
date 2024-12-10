@@ -1,0 +1,26 @@
+Part 1
+I began by creating a helper class to store the trail map and its starting points. 
+To handle input efficiently, I wrote a helper method that reads the input file and loads the trail map into this class. 
+Next, I created another helper method that takes a trail map and a point, 
+and determines all the points reachable from that point, 
+following the specified rule, movement could only go up, down, left, or right, 
+and only to points with a value exactly one higher than the current point’s value.
+
+Next I began, assembling the solution. I looped through all the starting points, and for each one, 
+initialized a queue to represent the trail. As long as there were points left in the queue, 
+I processed them by dequeuing the current point and checking if it was a trailhead. 
+If it was, I incremented the count of trailheads found. 
+If not, I added all reachable points from the current point to the queue. 
+However, this approach resulted in a incorrect results because I was counting the same trailhead multiple times. 
+To fix this, I used a set to store the unique trailheads found for each starting point 
+and then calculated the final result by counting the size of the sets.
+
+Part 2
+When I read the description for part 2, 
+I realized that the logic I implemented in Part 1 was already solving the problem for Part 2 in essence. 
+Since my trail-finding method explored all possible paths from each starting point, 
+it was only a matter of adapting the code slightly. Instead of using a set to track unique trailheads, 
+I replaced it with a simple counter to directly count the number of trailheads found, from uniq paths. 
+
+Both of these solutions could probably be optimized by loading the map into a graph 
+and then using a graph search algorithm, like DFS.
