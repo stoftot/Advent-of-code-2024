@@ -18,6 +18,10 @@ public class DayCreater {
             var testFile = new File(folderName + "/Data/test.txt");
             testFile.createNewFile();
             
+            //create Process Description file
+            var processFile = new File(folderName + "/processDescription.txt");
+            processFile.createNewFile();
+            
             //create main file
             var mainFile = new File(folderName + "/December"+today+".java");
             mainFile.createNewFile();
