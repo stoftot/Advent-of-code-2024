@@ -1,0 +1,2 @@
+Part 1
+removing to many zeros, converting what should be 100 to 10
